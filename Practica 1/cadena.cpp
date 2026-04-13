@@ -1,5 +1,4 @@
 #include "./cadena.hpp"
-#include <stdexcept>
 
 // Constructor por defecto
 Cadena::Cadena() : len_{0}, cad_{new char[1]} {
@@ -95,3 +94,53 @@ Cadena::~Cadena() {
     }
 }
 
+// Operacion de inserción 
+std::istream& operator>>(std::istream& is, Cadena& c){
+    char buffer[33]; // reservamos espacio para el límite (32 caracteres + "\0")
+    size_t i = 0;
+
+    // 1. Buscamos si hay espacio inicial
+    while (is && std::isspace(is.peek())){
+        is.get();
+    }
+    // Si se llega al final antes de encontrar palabra -> cadena vacía
+    if (!is) {
+        c = "";
+        return is;
+    }
+
+    // 2) Leer la palabra sin consumir el espacio final
+    while (is && !std::isspace(is.peek()) && i < 32) {
+        buffer[i++] = static_cast<char>(is.get());
+    }
+
+    buffer[i] = '\0';
+    c = buffer;
+
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const Cadena& c){
+    os << 
+}
+
+
+Cadena::Cadena(Cadena&& otra) noexcept : len_{otra.len_}, cad_{otra.cad_} {
+    otra.len_ = 0;
+    otra.cad_ = new char[1];
+    otra.cad_[0] = '\0'; 
+}
+
+Cadena& Cadena::operator=(Cadena&& otra) noexcept{
+    if (this != &otra){ // si son iguales omitimos el cambio
+        delete[] cad_;
+        len_ = otra.cad_;
+        cad_ = otra.cad_;
+        // Una vez reasignado el puntero cambiamos las cadenas
+        otra.cad_ = 0;
+        otra.cad_ = new char[1];
+        otra.cad_[0] = '\0';
+    }
+    
+    return *this;
+}

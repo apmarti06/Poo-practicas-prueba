@@ -1,4 +1,6 @@
 #include <ctime>
+#include <iostream>
+#include <iomanip>
 #include <cstdio> //Para hacer uso de sscanf
 #include <cmath>    //Para hacer uso de log y pow
 #include <utility>  //Para usar std::swap
@@ -175,8 +177,8 @@ Fecha Fecha::operator--(int i){
     return copia;
 }
 
-// Ultimo ejercicio conversion 
-Fecha::operator const char* () const
+// PRACTICA 1
+const char* Fecha::cadena () const // definimos antes operator const char* operator (operador de conversion)
 {
     // Rellenamos para saber que sea el dia de la semana
     std::tm fechaNormalizada = {};
@@ -201,5 +203,36 @@ Fecha::operator const char* () const
     std::sprintf(crep, "%s %d de %s de %d", dias_sem[fechaNormalizada.tm_mday], dia_, mes_nom[fechaNormalizada.tm_mon], año_);
     return crep;
 }
+
+// Flujo de extraccion
+std::ostream& operator<<(std::ostream& os, const Fecha& f)
+{
+    os << f.cadena();
+    return os;
+}
+
+// Flujo de inserción convirtiendo una cadena de bajo nivel a una fecha 
+std::istream& operator>>(std::istream& is, Fecha& f)
+{
+    char buffer[11];
+
+    is >> std::setw(11) >> buffer;
+
+    if (!is) {
+        return is;
+    }
+
+    try {
+        Fecha aux(buffer);
+        f = aux;
+    }
+    catch (const Fecha::Invalida&) {
+        is.setstate(std::ios::failbit);
+        throw;
+    }
+
+    return is;
+}
+
 
 // main std::cout << i;

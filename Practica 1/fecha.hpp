@@ -1,6 +1,8 @@
 #ifndef FECHAS_H
 #define FECHAS_H
 
+#include <iosfwd>
+
 class Fecha {
     public:
         
@@ -34,8 +36,13 @@ class Fecha {
         Fecha operator-(int i) const; // operador que no cambia (metodo const) (fecha + entero)
         Fecha &operator-=(int i);
 
-        // Operador de conversion de un puntero char
-        operator const char* () const;
+        // Operador de conversion de un puntero char, lo modificamos por la practica 1
+        //operator const char* () const;
+        const char* cadena() const;
+
+        // Sobrecargamos operadores de clase <<, >> y como no son miembros de la misma, los declaramos que son friend
+        friend std::ostream& operator<<(std::ostream& os, const Fecha& f);
+        friend std::istream& operator<<(std::istream& is, Fecha& f);
 
         // operadores de sobrecarga friend
         friend bool operator ==(const Fecha& A, const Fecha& B);
@@ -44,8 +51,6 @@ class Fecha {
         friend bool operator <=(const Fecha& A, const Fecha& B);
         friend bool operator >=(const Fecha& A, const Fecha& B);
         friend bool operator !=(const Fecha& A, const Fecha& B);
-
-        
 
         class Invalida {
             public:
