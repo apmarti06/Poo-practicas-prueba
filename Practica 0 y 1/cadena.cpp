@@ -103,7 +103,8 @@ std::istream& operator>>(std::istream& is, Cadena& c){
     while (is && std::isspace(is.peek())){
         is.get();
     }
-    // Si se llega al final antes de encontrar palabra -> cadena vacía
+    
+    //  Si se llega al final antes de encontrar palabra -> cadena vacía
     if (!is) {
         c = "";
         return is;
@@ -131,7 +132,7 @@ Cadena::Cadena(Cadena&& otra) noexcept : len_{otra.len_}, cad_{otra.cad_} {
     otra.cad_[0] = '\0'; 
 }
 
-Cadena& Cadena::operator=(Cadena&& otra) noexcept{
+Cadena& Cadena::operator=(Cadena&& otra) noexcept {
     if (this != &otra){ // si son iguales omitimos el cambio
         delete[] cad_;
         len_ = otra.cad_;
@@ -141,6 +142,6 @@ Cadena& Cadena::operator=(Cadena&& otra) noexcept{
         otra.cad_ = new char[1];
         otra.cad_[0] = '\0';
     }
-    
+
     return *this;
 }
