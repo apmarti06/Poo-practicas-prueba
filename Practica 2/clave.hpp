@@ -15,26 +15,26 @@ class Clave {
         // Ya que nuestra clase Cadena hará la conversion implícita
         Clave(const char* cad);
 
-        // Miembros de la clase
+        // Miembros de la clase (Uno que te ofrece la contraseña cifrada y la otra te verifica si es correcta)
         Cadena clave() const { return passwd_cif; }
         bool verifica (const char* cad) const;
 
-        // Para evaluar errores
-        class Incorrecta: public std::exception {
+        // Para evaluar errores si se cifra mal la contraseña o es demasiado corta
+        class Incorrecta: public std::exception { // hacemos esto para atrapar errores que se escapen de nuestro alcance
             public:
                  // Constructor de la excepción, recibe el mensaje de error
-                Incorrecta(const char* e) : error_(e) {}
+                Incorrecta(const char* e) : error_{e} {}
                 const char* razon() const noexcept {return error_; }
             private:
                 const char* error_;
         };
 
     private:
+        // Atributo de la clase Clave
         Cadena passwd_cif;
-        // Conjunto de caracteres entre los que escoger la «sal» para encriptar las claves.
-        // static const char caracteres_validos [];
 
+        // Miembros estaticos de la clase clave privados
+        static const char caracteres_validos[];
 };
-
 
 #endif

@@ -11,6 +11,9 @@ class Fecha {
         
         //Constructor de copia fecha
         Fecha(const Fecha& A);
+
+        // operador de asignacion
+        Fecha& operator =(const Fecha& A); 
         
         //Constructor de conversion a partir de cadena de bajo nivel (dd/mm/aa)
         Fecha(const char* fecha);
@@ -30,7 +33,6 @@ class Fecha {
         Fecha& operator --(); //Predecremento
         Fecha operator --(int i); //Posdecremento, usando i para decir el valor que poseia anterior mente
 
-        Fecha& operator =(const Fecha& A);
         Fecha operator+(int i) const; // operador que no cambia (metodo const) (fecha + entero)
         Fecha& operator +=(int i);
         Fecha operator-(int i) const; // operador que no cambia (metodo const) (fecha + entero)
@@ -42,9 +44,10 @@ class Fecha {
 
         // Sobrecargamos operadores de clase <<, >> y como no son miembros de la misma, los declaramos que son friend
         friend std::ostream& operator<<(std::ostream& os, const Fecha& f);
-        friend std::istream& operator<<(std::istream& is, Fecha& f);
+        friend std::istream& operator>>(std::istream& is, Fecha& f);
 
-        // operadores de sobrecarga friend
+        // operadores de sobrecarga friend, pues accedemos a miembros privados, si usaramos miembros publicos no seria necesario
+        //, pero es mas eficiente acceder a los miembros privados. Si se sobrecargase el operador para distintos tipos, sería obligatorio friend
         friend bool operator ==(const Fecha& A, const Fecha& B);
         friend bool operator >(const Fecha& A, const Fecha& B);
         friend bool operator <(const Fecha& A, const Fecha& B);
@@ -70,6 +73,5 @@ class Fecha {
         static bool descomponerFecha(const char* fechaFormateada, int &dia, int &mes , int &año);
         void validarFecha() const;
 };
-
 
 #endif

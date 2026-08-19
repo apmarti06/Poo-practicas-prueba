@@ -7,6 +7,8 @@
 #include <cctype>
 #include <iterator>
 
+#include <functional>  // Para std::hash
+
 class Cadena {
 public:
     // iteradores
@@ -19,10 +21,13 @@ public:
     Cadena(const char* cad);          // desde C-string (nullptr -> "")
     Cadena(size_t n, char c);         // n repeticiones de c
     Cadena(const Cadena& otra);       // constructor de copia
-    Cadena& operator=(const Cadena& otra);
-    Cadena& operator=(const char* a); // operadores de asignacion con un puntero char
-    explicit inline operator const char*() const {return cad_;}; // operador de conversion, el cual declaramos que sea explicito la conversión
-    
+
+    Cadena& operator=(const Cadena& otra); // operador de asignación normal
+    Cadena& operator=(const char* a); // operadores de asignacion con un puntero char, cadena bajo nivel
+
+    // Conversión explícita a const char*, indicando que no se puede hacer de forma implícita, para evitar errores de conversión 
+    explicit inline operator const char*() const {return cad_;}; 
+
     // Semántica de movimientos
     Cadena(Cadena&& otra); // constructor de movimiento
     Cadena& operator=(Cadena&& otra); // asignacion de movimiento
@@ -81,15 +86,14 @@ public:
     }
 
     // Implementacion requerida real 
-    // ========== FUNCIONES "C" (EXPLÍCITAMENTE CONST) ==========
     inline const_iterator cbegin() const noexcept { return begin(); }
     inline const_iterator cend() const noexcept { return end(); }
     inline const_reverse_iterator crbegin() const noexcept { return rbegin(); }
     inline const_reverse_iterator crend() const noexcept { return rend(); }
 
-
     // Destructor
     ~Cadena();
+
 private:
     size_t len_;
     char* cad_;
@@ -98,27 +102,41 @@ private:
 // lo declaramos fuera de la clase pues no queremos acceder a miembros privados
 Cadena operator+(const Cadena& A, const Cadena& B);
 
-// operadores de indice de la clase Cadena, públicos
-inline const char& Cadena::operator[](size_t i) const{
+// operadores de indice de la clase Cadena ejemplo X, X[i] y X.at(i) para lectura y escritura, con control de errores en at()
+
+inline const char& Cadena::operator[](size_t i) const{ // metodo const del operador (solo lectura)
     return cad_[i];   
 }
 
-inline char& Cadena::operator[](size_t i){
+inline char& Cadena::operator[](size_t i){ // metodo no-const del operador (escritura-lectura)
     return cad_[i];
 }
 
-inline const char& Cadena::at(size_t i) const{
+inline const char& Cadena::at(size_t i) const{ // metodo const del operador (solo lectura)
     if (i >= len_){
         throw std::out_of_range("Indice fuera de rango");
     }
     return cad_[i];
 }
 
-inline char& Cadena::at(size_t i){
+inline char& Cadena::at(size_t i){ // metodo no-const del operador (escritura-lectura)
     if (i >= len_){
         throw std::out_of_range("Indice fuera de rango");
     }
     return cad_[i];
+}
+
+
+// ESPECIALIZACIÓN DE std::hash PARA Cadena (AQUÍ, en cadena.hpp), para la práctica 2, donde ha sido depurada
+namespace std {
+    template<>
+    struct hash<Cadena> {
+        size_t operator()(const Cadena& c) const noexcept {
+            // Convertir a const char* y luego a string para usar su hash
+            const char* str = static_cast<const char*>(c);
+            return std::hash<std::string>{}(std::string(str));
+        }
+    };
 }
 
 #endif

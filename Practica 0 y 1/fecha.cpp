@@ -75,7 +75,6 @@ Fecha& Fecha::operator =(const Fecha& A) {
     std::swap(dia_, copia.dia_);
     std::swap(mes_, copia.mes_);
     std::swap(año_, copia.año_);
-
     return *this;
 }
 
@@ -130,6 +129,29 @@ bool operator !=(const Fecha& A, const Fecha& B) {
 
 // Operadores que usamos copias del objeto para calcular fechas, (metodos const)
 
+Fecha& Fecha::operator +=(int i) 
+{
+    std::tm fechaNormalizada = {};
+
+    fechaNormalizada.tm_mday = dia_ + i;
+    fechaNormalizada.tm_mon = mes_ - 1;
+    fechaNormalizada.tm_year = año_ - 1900;
+    std::mktime(&fechaNormalizada);
+
+    dia_ = fechaNormalizada.tm_mday;
+    mes_ = fechaNormalizada.tm_mon + 1;
+    año_ = fechaNormalizada.tm_year + 1900;
+    actual = false;
+    try {
+        validarFecha();
+    } catch (const Fecha::Invalida& e) {
+        throw("Error, de fecha inválida"); // Propagamos la excepción hacia arriba
+    } catch (...) {
+        throw("Error desconocido al validar la fecha");
+    }
+    return *this;
+}
+
 Fecha Fecha::operator +(int i) const{
     Fecha copia;
     copia = *this;
@@ -160,7 +182,7 @@ Fecha& Fecha::operator ++(){ // Preincremento
 
 // Preincremento devuelve el objeto modificado
 Fecha& Fecha::operator --(){ // Preincremento
-    return *this += 1;
+    return *this += -1;
 }
 
 // Postincremento devuelve el objeto dandole el valor al deseado, y luego realiza el incremento
@@ -233,6 +255,5 @@ std::istream& operator>>(std::istream& is, Fecha& f)
 
     return is;
 }
-
 
 // main std::cout << i;

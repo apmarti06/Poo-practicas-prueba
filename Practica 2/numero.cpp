@@ -4,7 +4,11 @@
 bool luhn(const Cadena& numero);
 
 // creamos el numero de tarjeta
-Numero::Numero(Cadena n) : num_t{longitud(n)} {
+
+// Primero al llamar a validar, eliminamos los espacios que tengamos
+// Despues validamos la longitud dentro de la lista inicializadora, tras terminar la llamada
+// Hacemos uso del constructor de copia para crear num_t, y por último verificamos que sea un número
+Numero::Numero(Cadena n) : num_t{validar_longitud(n)} {
     char caracteres[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
     // Comprobamos sus digitos y otros casos
@@ -24,6 +28,7 @@ Cadena Numero::eliminar_espacios(const Cadena& A){
     const char* original = A.operator const char *();
     size_t j = 0; // hacemos copiar nuestra cad auxiliar, los que no haya _
 
+    // copiamos aquellos que no tengan espacio, aquí podríamos comprobar si solo son dígitos
     for (size_t i = 0; i != strlen(original); i++){
             if (!isspace(original[i])){
                 // Hacemos uso del postincremento en el index
@@ -34,7 +39,7 @@ Cadena Numero::eliminar_espacios(const Cadena& A){
     return aux;
 }   
 
-Cadena Numero::longitud(const Cadena& cad){
+Cadena Numero::validar_longitud(const Cadena& cad){
     Cadena res = eliminar_espacios(cad);
     // Probamos si se cumple los requisitos
     if (res.length() < 19 && res.length() > 13){
@@ -44,6 +49,7 @@ Cadena Numero::longitud(const Cadena& cad){
     }
 }
 
-bool operator <(const Numero& A, const Numero& B){
-    return (strcmp(A, B) < 0);
+// Hacemos uso de static_cast para que apunte y haga la conversión correcta a una cadena de bajo nivel
+bool operator<(const Numero& A, const Numero& B) {
+    return strcmp(static_cast<const char*>(A), static_cast<const char*>(B));
 }

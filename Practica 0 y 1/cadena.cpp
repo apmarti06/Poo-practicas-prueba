@@ -25,15 +25,17 @@ Cadena::Cadena(size_t n, char c) : cad_{new char[n + 1]}, len_{n} {
 
 // CONSTRUCTOR DE COPIA DEFINIDO
 Cadena::Cadena(const Cadena& otra) : cad_{new char[otra.len_ + 1]}, len_{otra.len_} {
+    // no se le asigna, pues seria que un puntero apuntase al mismo espacio, donde al salir de la funcion se daría un delete,
+    // lo cual no queremos ya que estaría mal
     std::strcpy(cad_, otra.cad_);
 }
 
 // Sobrecargamos el operador de asignación dos veces
 Cadena& Cadena::operator=(const Cadena& otra) {
-    if (this != &otra) {
+    if (this != &otra) { // importante, si fueran iguales el delete[] borraría la cadena de memoria y luego no podríamos copiarla
         char* nuevo = new char[otra.len_ + 1];
         std::strcpy(nuevo, otra.cad_);
-        delete[] cad_;
+        delete[] cad_; // borramos la basura donde apuntase cad_ para evitar fugas de memoria
         cad_ = nuevo;
         len_ = otra.len_;
     }
@@ -63,27 +65,22 @@ Cadena operator +(const Cadena& A, const Cadena& B){
 }
 
 Cadena Cadena::substr(size_t pos, size_t n) const{
-    // Precondiciones manejando errores
-    if (pos > len_){
+    if (pos + n > len_){   // Precondiciones manejando errores
         throw std::out_of_range("Índice fuera de rango");
     }
-
-    if (pos + n > len_){
-        n = len_ - pos; // la variamos para que no copie datos que no existan
-    }
     
-    char* nueva = new char[n + 1]; //ampliamos, añadiendo el caracter nulo
-    for (size_t i = 0, j = pos; i < n; i++, j++){ // añadimos la cadena substraída
+    size_t m = len_ - pos; 
+    
+    char* nueva = new char[m + 1]; //ampliamos, añadiendo el caracter nulo
+    for (size_t i = 0, j = pos; i < m; i++, j++){ // añadimos la cadena substraída
         nueva[i] = cad_[j];
     }
 
-    nueva[n] = '\0';
-    // creamos nuestra nueva clase y retornamos
-    Cadena resultado(nueva);
-    // aseguramos que nueva se borre de la memoria
+    nueva[m] = '\0'; // caracter nulo al final
+    
+    Cadena resultado(nueva); // creamos un objeto de tipo Cadena con la subcadena
     delete[] nueva;
     nueva = nullptr;
-
     return resultado;
 }
 
@@ -110,7 +107,7 @@ std::istream& operator>>(std::istream& is, Cadena& c){
         return is;
     }
 
-    // 2) Leer la palabra sin consumir el espacio final
+    // 2) Leer la palabra sin consumir el espacio final, asegurandonos que sea un char
     while (is && !std::isspace(is.peek()) && i < 32) {
         buffer[i++] = static_cast<char>(is.get());
     }
@@ -121,27 +118,27 @@ std::istream& operator>>(std::istream& is, Cadena& c){
     return is;
 }
 
+// Como hacemos una conversion explicita, (requerida por el enunciado) no podemos hacer una conversion implicita, por lo que debemos hacer un cast a const char* para poder imprimirlo
 std::ostream& operator<<(std::ostream& os, const Cadena& c){
-    os << 
+    os << static_cast<const char*>(c);
+    return os;
 }
 
+// La semantica de movimiento se encarga de borrar automaticamente la memoria de un objeto que ya no se va a usar, evitando fugas de memoria y mejorando el rendimiento al evitar copias innecesarias. Esto es especialmente útil en contenedores y algoritmos que manejan grandes cantidades de datos, donde la eficiencia es crucial.
 
 Cadena::Cadena(Cadena&& otra) noexcept : len_{otra.len_}, cad_{otra.cad_} {
     otra.len_ = 0;
-    otra.cad_ = new char[1];
-    otra.cad_[0] = '\0'; 
+    otra.cad_ = nullptr; 
 }
 
 Cadena& Cadena::operator=(Cadena&& otra) noexcept {
     if (this != &otra){ // si son iguales omitimos el cambio
         delete[] cad_;
-        len_ = otra.cad_;
+        len_ = otra.len_;
         cad_ = otra.cad_;
         // Una vez reasignado el puntero cambiamos las cadenas
         otra.cad_ = 0;
-        otra.cad_ = new char[1];
-        otra.cad_[0] = '\0';
+        otra.cad_ = nullptr;
     }
-
     return *this;
 }

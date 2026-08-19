@@ -69,7 +69,7 @@ int main()
   cout << "Volvemos a hoy: " << hoy << endl;
 
   // Pruebas de excepciones
-  try {
+  try {   
     Fecha("20/1/2000");
     Fecha("31/2/2000");
   } catch(const Fecha::Invalida &e)

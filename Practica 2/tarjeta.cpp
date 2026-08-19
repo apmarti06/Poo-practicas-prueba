@@ -12,7 +12,7 @@ Tarjeta::Tarjeta(const Numero& n, Usuario& u, const Fecha& f) : numero_{n}, titu
     }
 
     // Comprobamos la duplicidad, viendo al usar el iterador a los eltos de la tarjeta
-    // si la insercion es posible el valor de los pares sera true (por defecto) en el bool si no se puede
+    // si la insercion es posible el valor derecho del par sera true (por defecto) en el bool si no se puede
     // ya que esta repetido, seguira false por lo que comparamos apartir de este valor
 
     std::pair<It, bool> res = tarjetas_.insert(id);
@@ -24,7 +24,7 @@ Tarjeta::Tarjeta(const Numero& n, Usuario& u, const Fecha& f) : numero_{n}, titu
     titular_->es_titular_de(*this);
 } 
 
-Tipo Tarjeta::tipo() const noexcept { // evaluamos los 6 casos que tenemos, y usamos el [] de cadena
+Tipo Tarjeta::tipo() const noexcept { // evaluamos los 6 casos que tenemos, y usamos el [] de cadena, pues se evalua con el primer digito (carácter)
     switch(numero_[0]){
         case '3':
             if(numero_[1] == 4 || numero_[1] == 7){
@@ -50,19 +50,18 @@ Tipo Tarjeta::tipo() const noexcept { // evaluamos los 6 casos que tenemos, y us
 
 Tarjeta::~Tarjeta(){
     // Primero desvinculamos de su titular, todas las tarjetas
-    if (Usuario* user = const_cast<Usuario*>(titular_)) 
-        user->no_es_titular_de(*this);
-    // eliminamos despues de desvincular
-    tarjetas_.erase(numero_);
+    if (titular_ != nullptr)  // al ser const conversion con const_cast, donde guardamos el puntero para borrarlo
+    const Usuario* user = const_cast<Usuario*>(titular_);
+    user->no_es_titular_de(*this);  // Esto solo anula, no elimina, pues eliminar sería un fallo
 }
 
-bool operator<(const Tarjeta& A, const Tarjeta& B){
+bool operator<(const Tarjeta& A, const Tarjeta& B){ // sobrecarga donde A.numero(), llama a los static<cast>, haciendo la conversion explicita de cadena
     return (A.numero() < B.numero());
 }
 
-
 // Metodos privados, donde al eliminar el Usuario, rompemos el enlace de la tarjeta - Usuario
 void Tarjeta::anular_titular() noexcept{
+    // si apuntamos a algo, al asegurarnos que es const (debería almacenar por cojones algo), borramos para ese usuario la tarjeta
     if(titular_ != nullptr){
         titular_ = nullptr;
         activa = false;
