@@ -1,39 +1,42 @@
 #include "pedido_articulo.hpp"
 
 // creamos todo tipo de iterador para buscar en diccionarios, nose si serian correctos
-typedef PedidoArticulo::ItemsPedido::iterator IT;
-typedef PedidoArticulo::Pedidos::iterator IP;
+typedef PedidoArticulo::ItemsPedido::const_iterator IT;
+typedef PedidoArticulo::Pedidos::const_iterator IP;
 
-typedef PedidoArticulo::Pedido_Articulo::iterator ID;
-typedef PedidoArticulo::Articulo_Pedido::iterator II;
+typedef PedidoArticulo::Pedido_Articulo::const_iterator ID;
+typedef PedidoArticulo::Articulo_Pedido::const_iterator II;
 
 bool PedidoArticulo::OrdenaArticulos::operator() (const Articulo* A, const Articulo* B){
     return (A->referencia() < B->referencia());
 }
 
-bool PedidoArticulo::::operator() (const Pedido* A, const Pedido* B){
+bool PedidoArticulo::OrdenaPedidos::operator() (const Pedido* A, const Pedido* B){
     return (A->numero() < B->numero());
 }
 
-void PedidoArticulo::pedir(const Pedido& p, const Articulo& a, double pv, unsigned n = 1){
+void PedidoArticulo::pedir(const Pedido& p, const Articulo& a, double pv, unsigned int n = 1){
+    // creamos en pedir el objeto linea de pedido para meterlo en el diccionario
     LineaPedido lp(pv, n);
 
-    // creamos los enlaces de linea de venta directa e inversa, sin tener en cuenta que haya ocurrencias ya que estan ordenadas
-    directa[&p].insert(std::make_pair(&a, lp));
-    inversa[&a].insert(std::make_pair(&p, lp));
+    // creamos los enlaces de linea de venta directa e inversa, 
+    //sin tener en cuenta que haya ocurrencias ya que estan ordenadas
+    directa[&p].insert(std::make_pair(&a, lp)); // <Pedido*, map<Articulo*, LineaPedido, OrdenaArticulos>, OrdenaPedidos>
+    inversa[&a].insert(std::make_pair(&p, lp)); // <Articulo*, map<Pedido*, LineaPedido, OrdenaPedidos>, OrdenaArticulos>
 }
 
-void PedidoArticulo::pedir(const Articulo& a, const Pedido& p, double pv, unsigned n = 1){
+void PedidoArticulo::pedir(const Articulo& a, const Pedido& p, double pv, unsigned int n = 1){
     pedir(p, a, pv, n);
 }
 
 const PedidoArticulo::ItemsPedido PedidoArticulo::detalle(const Pedido& P) const{
     // buscamos el pedido, para ver si tiene asignado un articulo
-    auto i = directa.find(&P);
+    ID i = directa.find(&P);
 
     if(i != directa.end()){
-        return i->second; // devolvemos el pedido si existe
+        return i->second; // devolvemos el pedido si existe (ItemsPedido)
     } else {
+        // si no existe devolvemos un pedido vacio
         PedidoArticulo::ItemsPedido pedido_vacio;
         return pedido_vacio;
     }
@@ -41,7 +44,7 @@ const PedidoArticulo::ItemsPedido PedidoArticulo::detalle(const Pedido& P) const
 
 const PedidoArticulo::Pedidos PedidoArticulo::ventas(const Articulo& A) const{
     // buscamos el articulo, para ver si esta asignado a un pedido
-    auto i = inversa.find(&A);
+    II i = inversa.find(&A);
     
     if(i != inversa.end()){
         return i->second; // devolvemos el pedido si existe
@@ -72,7 +75,7 @@ std::ostream& operator<<(std::ostream& os, const PedidoArticulo::ItemsPedido& IP
     return os;
 }
 
-// Mostrar detalles como precio, cantidad, fecha
+// Mostrar detalles como precio, cantidad, fecha de un pedido
 std::ostream& operator<<(std::ostream& os, const PedidoArticulo::Pedidos& pedidos){
     // variables locales total y n ejemplares
     double total = 0.0;
@@ -101,16 +104,15 @@ std::ostream& operator<<(std::ostream& os, const PedidoArticulo::Pedidos& pedido
 // Operadores mostrar de clase asociacion, haciendo uso de los operadores creados ventas, y detalles para que no haya problemas de conversion
 
 //  imprimirá en el flujo de salida proporcionado el detalle de todos los pedidos
-// realizados hasta la fecha, así como el importe de todas las ventas.
 std::ostream& PedidoArticulo::mostrarDetallesPedidos(std::ostream& os) const{
     // inicializamos las variables locales a usar
     double total = 0.0;
     unsigned npedido = 0;
 
-    for (const PedidoArticulo::Pedido_Articulo& i : directa){
-        npedido++;  // nose como se accede bien de la tarjeta al cliente (nom) 
-        os << "\nPedido núm: " << npedido << std::endl << "Cliente:" << (*i.first)->tarjeta()->titular()
-        << detalle(*i.first) << std::endl;
+    for (const PedidoArticulo::Pedido_Articulo& i : directa){ // i es el iterador de la clase asociacion directa, que contiene el pedido y el map de articulos
+        npedido++;  `
+        os << "\nPedido núm: " << npedido << std::endl << "Cliente:" << (*i.first)
+        << detalle(*i.first) << std::endl; // llamamos al operador de flujo de insercion para mostrar el detalle del pedido
         total += i.first->total();
     }
     os << "Total Ventas\t " << std::fixed << std::setprecision(2) << total << "$ " << std::endl;
@@ -122,7 +124,7 @@ std::ostream& PedidoArticulo::mostrarDetallesPedidos(std::ostream& os) const{
 std::ostream& PedidoArticulo::mostrarVentasArticulos(std::ostream& os) const{
     for (const PedidoArticulo::Articulo_Pedido& i : inversa){
         os << "Ventas de [" << (i.first)->referencia() << "]" <<
-        (i.first)->titulo << " " << ventas(i.first) << std::endl;
+        (i.first)->titulo << " " << ventas(i.first) << std::endl; // llamamos al operador de flujo de insercion para mostrar el detalle del articulo 
     }
     return os;
 }

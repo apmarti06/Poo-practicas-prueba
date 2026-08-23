@@ -1,7 +1,7 @@
 #include "pedido.hpp"
 
-// inicializamos nuestro atributo estatico constante
-int Pedido::n_pedidos = 0;
+// inicializamos nuestro atributo estatico 
+int Pedido::n_pedidos_ = 0;
 
 // Implementación del método observador estático
 int Pedido::n_pedidos() noexcept {
@@ -9,7 +9,7 @@ int Pedido::n_pedidos() noexcept {
 }
 
 Pedido::Pedido(UsuarioPedido& UP, PedidoArticulo& PA, Usuario& u,
-    const Tarjeta& t, const Fecha& f) : num_{n_pedidos_ + 1}, tarjeta_{&t}, fecha_{f}, total_{0.0} {
+    const Tarjeta& t, const Fecha& f) : num_{n_pedidos_++}, tarjeta_{&t}, fecha_{f}, total_{0.0} {
         // si no hay articulos
         if (u.compra().empty()) throw Pedido::Vacio(&u);
 
@@ -18,9 +18,10 @@ Pedido::Pedido(UsuarioPedido& UP, PedidoArticulo& PA, Usuario& u,
 
         // si la tarjeta esta caducada o desactivado, excepción
         if (t.caducidad() < fecha_) throw Pedido::Caducada(t.caducidad());
+        if (!t.activa()) throw Pedido::Desactivada(t);
 
-        // Vemos si queda stock del articulo
-        for (auto i : u.compra()){
+        // Vemos si queda stock de todos los articulos <Articulo*, size_t>
+        for (Usuario::Articulos::const_iterator i = u.compra().begin(); i != u.compra().end(); i++){
             if((i.first)->stock() < i->second){ // vemos si la cantidad de articulos es superior al del su maximo
                 u.vaciar_carro();
                 throw Pedido::SinStock(i.first);
@@ -28,23 +29,33 @@ Pedido::Pedido(UsuarioPedido& UP, PedidoArticulo& PA, Usuario& u,
         }
 
         // creamos las asociaciones existentes de clases
-
-        // asociacion usuario-pedido
         UP.asocia(*this, u);
 
-        for (auto& i: u.compra()){ // clave articulo, valor num prod
-            // importe total = precio articulo * cantidad_producto
-            total_ += i.first->precio() * i.second;
+        for (Usuario::Articulos::const_iterator it = u.compra().begin(); i != u.compra().end(); i++){
+            Articulo* A = it->first; // obtenemos el articulo correspondiente
+            size_t cont = it->second; // obtenemos el numero de ejemplares del producto
+
+            // obtenemos el precio de venta
+            double pv_a = A->precio();
+
+            // calculamos el precio total del producto
+            total_ += pv_a * cont;
 
             // añadimos en enlace de pedido_articulo (pedido, articulo, precio venta ,cantidad)
-            PA.pedir(*this, i.first, (i.first)->preio(), i.second);
+            PA.pedir(*this, i.first, pv_a, cont); // pedir(Pedido&, Articulo&, double pv, size_t n)
 
             // actualizamos el stock de dicho articulo
             (i.first)->stock() -= i.second;
         }
-
-        // Aumentamos el n_pedidos del usuario
-        n_pedidos_++;
-    }
+    // vaciamos el carro del usuario
+    u.vaciar_carro();
+}
 
 // falta operador de insercion de flujo
+std::ostream& operator<<(std::ostream& os, const Pedido& p){
+    os << "Nº Pedido: " << p.numero() << std::endl;
+    os << "Fecha: " << p.fecha() << std::endl;
+    os << "Tarjeta: " << p.tarjeta()->type() << "Nº:" << p.tarjeta()->numero() << std::endl;
+    os << "Importe total: " << std::fixed << std::setprecision(2) << p.total() << " €" << std::endl;
+    return os;
+};

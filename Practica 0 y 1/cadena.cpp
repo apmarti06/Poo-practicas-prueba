@@ -8,6 +8,7 @@ Cadena::Cadena() : len_{0}, cad_{new char[1]} {
 // copiamos la cadena de un string a teclado
 Cadena::Cadena(const char* cad) {
     if (cad == nullptr) {
+        // misma implementacion que el por defecto (podríamos llamarlo y devolver dicha cadena)
         len_ = 0;
         cad_ = new char[1];
         cad_[0] = '\0';
@@ -42,14 +43,14 @@ Cadena& Cadena::operator=(const Cadena& otra) {
     return *this;
 }
 
-Cadena& Cadena::operator=(const char* copia){
-    // usamos el constructor de copia para pasarlo luego como objeto
+Cadena& Cadena::operator=(const char* copia){ // a = "hola";
+    // usamos el constructor con cadena de bajo nivel, para pasarlo luego como objeto
     Cadena otra(copia);
     *this = otra;
     return *this;
 }
 
-Cadena& Cadena::operator+=(const Cadena& A){
+Cadena& Cadena::operator+=(const Cadena& A){ // b += a 
     char* temp = new char[std::strlen(A.cad_) + std::strlen(cad_) + 1];
     std::strcpy(temp, cad_);
     std::strcat(temp, A.cad_);
@@ -58,13 +59,13 @@ Cadena& Cadena::operator+=(const Cadena& A){
     return *this;
 }   
 
-Cadena operator +(const Cadena& A, const Cadena& B){
+Cadena operator +(const Cadena& A, const Cadena& B){ // c = a + b
     Cadena temp = A;
     temp += B;
     return temp;
 }
 
-Cadena Cadena::substr(size_t pos, size_t n) const{
+Cadena Cadena::substr(size_t pos, size_t n) const{ // obtenemos una parte de una cadena 
     if (pos + n > len_){   // Precondiciones manejando errores
         throw std::out_of_range("Índice fuera de rango");
     }
@@ -120,7 +121,7 @@ std::istream& operator>>(std::istream& is, Cadena& c){
 
 // Como hacemos una conversion explicita, (requerida por el enunciado) no podemos hacer una conversion implicita, por lo que debemos hacer un cast a const char* para poder imprimirlo
 std::ostream& operator<<(std::ostream& os, const Cadena& c){
-    os << static_cast<const char*>(c);
+    os << c.operator const char *();
     return os;
 }
 
@@ -137,8 +138,9 @@ Cadena& Cadena::operator=(Cadena&& otra) noexcept {
         len_ = otra.len_;
         cad_ = otra.cad_;
         // Una vez reasignado el puntero cambiamos las cadenas
-        otra.cad_ = 0;
-        otra.cad_ = nullptr;
     }
+    otra.cad_ = 0;
+    otra.cad_ = nullptr;
+    
     return *this;
 }

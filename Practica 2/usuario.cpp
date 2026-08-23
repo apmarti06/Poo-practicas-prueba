@@ -16,7 +16,7 @@ Usuario::Usuario(Cadena id, Cadena n, Cadena ap, Cadena dir, Clave c) : identifi
     // consultamos en nuestro diccionario de claves si existe, por ID, second es un booleano
     // Si la inserción falla (second == false), el ID ya existe
     if (!res.second) {
-        throw ("Usuario duplicado" Usuario::Id_duplicado(id));
+        throw (Usuario::Id_duplicado(id));
     }
 }
 
@@ -24,8 +24,9 @@ Usuario::~Usuario(){
     // eliminamos todas sus tarjetas, antes de borrarlo
     typedef Usuario::Tarjetas::iterator IT_tar;
     for (IT_tar i = tarjetas_.begin(); i != tarjetas_.end(); i++){ //Usuario::Tarjetas::iterator it para modificar 
-        (i->second).anular_titular();
+        (i->second)->anular_titular();
     }
+
     // eliminamos el usuario de la lista correspondiente, unordered_set
     id_usuarios.erase(identificador_);
 }
@@ -34,7 +35,7 @@ Usuario::~Usuario(){
 
 void Usuario::es_titular_de(Tarjeta& T){
     // hacemos la asociacion Usuario 1 --- N tarjetas
-    if (*this->id() == (T.titular())->id()){ // this == T.titular(), mal pues no tenemos método operator==(), pues id es único
+    if (this == (T.titular())){ // this == T.titular(), mal pues no tenemos método operator==(), pues id es único
         tarjetas_.insert(std::make_pair(T.numero(), &T)); // creamos la asociacion, donde le metemos la clave numero, y la tarjeta T <Numero, Tarjeta*>
     }
 }
@@ -73,6 +74,7 @@ void Usuario::comprar(Articulo& A, size_t cant){
                 it->second -= cant;
             }
         }
+        
     } else {
         articulos_.erase(&A);
     }
@@ -80,14 +82,14 @@ void Usuario::comprar(Articulo& A, size_t cant){
 
 // Operador de flujo de salida + otro método al for tradicional (parecido a python)
 std::ostream& operator <<(std::ostream& os, const Usuario& user){
-    os << user.id() << "[" << user.clave().operator const char*() <<  "]" << user.nombre() 
+    os << user.id() << "[" << user.clave()->operator const char*() <<  "]" << user.nombre() 
     << user.apellidos() << std::endl; // Recordamos que el operador de clave llama al operador de cadena que convierte explicitamente a un const char*
 
     os << user.direccion() << std::endl;
     os << "Tarjetas" << std::endl; 
 
-    for (const Usuario& lista_tarjetas: U.tarjetas()){
-        os << (lista_tarjetas->second).tipo() << std::endl; 
+    for (const Usuario& lista_tarjetas: user.tarjetas()){
+        os << (lista_tarjetas->second).type() << std::endl; 
         os << (lista_tarjetas->first).numero() << std::endl; 
         os << user.nombre() << user.apellidos() << std::endl; // usar conversor a mayus
         os << "Caduca en:" << (lista_tarjetas->second).caducidad() << std::endl; 

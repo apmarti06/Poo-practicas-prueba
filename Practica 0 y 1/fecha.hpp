@@ -19,12 +19,11 @@ class Fecha {
         Fecha(const char* fecha);
 
         //Funciones observadoras
-
         inline int dia() const { return dia_; };
         inline int mes() const { return mes_; };
         inline int año() const { return año_; };
 
-        //Miembros de la clase
+        //Miembros de la clase, estáticos
         static const int AñoMinimo = 1902, AñoMaximo = 2037;
         
         //Sobrecarga de operadores

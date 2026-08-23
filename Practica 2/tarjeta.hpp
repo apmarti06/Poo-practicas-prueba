@@ -1,17 +1,16 @@
-#include "usuario.hpp"
-#include "fecha.hpp"
-
 #ifndef TARJETA_HPP
 #define TARJETA_HPP
 
+#include "usuario.hpp"
+#include "fecha.hpp"
+
 // Para llamar a funciones de clases especificas para implementar miembros
 class Usuario;  
-
 class Tarjeta {
     public:
 
         typedef enum {Otro, VISA, Mastercard, Maestro, JCB, AmericanExpress} Tipo;
-        Tarjeta(const Numero&, Usuario&, const Fecha&);
+        Tarjeta(const Numero&, const Usuario&, const Fecha&);
 
         // Como para el usuario, decimos que no se puede crear copias de estas delegamos al operador de asignacion y su constructor de copia
         Tarjeta(const Tarjeta& otra) = delete;
@@ -25,18 +24,18 @@ class Tarjeta {
         const Fecha caducidad() const noexcept { return caducidad_; }
 
         // Observadora - modificadora de tarjetas, sobrecargando activa
-        bool activa() const noexcept {return activa; }
+        bool activa() const noexcept {return activa_; }
 
         bool activa(bool estado) noexcept {
-            activa = estado;
-            return activa;
+            activa_ = estado;
+            return activa_;
         }
 
         // Método bidireccional entre Usuario-Tarjeta
-        void es_titular_de(Usuario& t) noexcept;
+        void es_titular_de(const Usuario& t) noexcept;
 
         // Método que devuelve que tipo de tarjeta es la que se esta utilizando MasterCard ...
-        Tipo tipo() const noexcept;
+        Tipo type() const noexcept;
         
         // Destructor
         ~Tarjeta();
@@ -70,7 +69,7 @@ class Tarjeta {
         const Numero numero_; // si desaparece la instancia (composicion)
         const Usuario* titular_; // no desaparece la instancia (agregacion), pues es el puntero entre Usuario-Tarjeta, pero no debe variar en el tiempo (es único)
         const Fecha caducidad_; // si desaparece la instancia (composicion)
-        bool activa;
+        bool activa_;
 
         // Evitamos la duplicidad de tarjetas usando unordered_set donde nos aseguramos nosotros que no se repita
         static std::unordered_set<Numero> tarjetas_;

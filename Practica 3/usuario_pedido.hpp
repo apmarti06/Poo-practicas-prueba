@@ -20,11 +20,11 @@ class UsuarioPedido {
         void asocia(Pedido& p, Usuario& u);
 
         // Metodos observadores, devolver los pedidos del usuario x, y de un pedido cual fue su usuario
-        Pedidos pedidos(Usuario& U) const;
-        Usuario* cliente(Pedido& p) const;
+        const Pedidos pedidos(Usuario& U) const;
+        const Usuario* cliente(Pedido& p) const;
 
     private: 
     // contenedores de las claves a guardar y valores
-        Usuario_Pedido usuario_pedido;
-        Pedido_Usuario pedido_usuario;
+        Usuario_Pedido directa_;
+        Pedido_Usuario inversa_;
 };

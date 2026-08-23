@@ -33,7 +33,7 @@ class Pedido {
         // verifica si la tarjeta del titular pertenece al usuario
         class Impostor {
             public:
-                Vacio(Usuario* u) : user_{u} {}
+                Impostor(Usuario* u) : user_{u} {}
                 Usuario& usuario() const { return *user_; }
             private: 
                 Usuario* user_;
@@ -43,7 +43,7 @@ class Pedido {
         class SinStock{
             public: 
                 SinStock(Articulo* a) : articulo_{a} {}
-                Articulo& articulo() const { return *articulo_; }
+                Articulo& articulo() const { return &articulo_; }
             private:
                 Articulo* articulo_;
         };

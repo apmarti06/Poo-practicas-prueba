@@ -11,7 +11,7 @@
 
 class Cadena {
 public:
-    // iteradores
+    // iteradores, no son más que punteros
     typedef char* iterator;
     typedef const char* const_iterator;
     typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -52,7 +52,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Cadena& c);
     friend std::istream& operator>>(std::istream& is, Cadena& c);
 
-    //Operadores lógicos, acceso directo necesitado lo creamos como friend
+    // Operadores lógicos, acceso directo necesitado lo creamos como friend
+    // (pues no tenemos acceso público a miembros especificos a cad_)
     inline friend bool operator ==(const Cadena& A, const Cadena& B) { return strcmp(A.cad_, B.cad_) == 0; }
     inline friend bool operator !=(const Cadena& A, const Cadena& B) { return !(A == B); };
     inline friend bool operator <(const Cadena& A, const Cadena& B)  { return strcmp(A.cad_, B.cad_) < 0; }
@@ -61,8 +62,8 @@ public:
     inline friend bool operator >=(const Cadena& A, const Cadena& B) { return !(A < B); }
 
     // Metodos no-const de funciones iteradoras
-    inline iterator begin() noexcept {return cad_;}
-    inline iterator end() noexcept {return cad_ + len_;}
+    inline iterator begin() noexcept {return cad_;} // devuelve la pos del puntero
+    inline iterator end() noexcept {return cad_ + len_;} // devuelve dicha pos donde apunta al final de la cadena (donde no hay nada offset + direccion)
 
     inline reverse_iterator rbegin() noexcept {
         return reverse_iterator(end());

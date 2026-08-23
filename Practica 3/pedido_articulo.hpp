@@ -8,7 +8,7 @@
 
 class PedidoArticulo {
     public:
-        // Creamos los miembros públicos de los diccionarios de las clases de asociación
+        // Creamos los miembros públicos de los diccionarios de las clases de asociación (ordenación)
         struct OrdenaArticulos {
             bool operator() (const Articulo* A, const Articulo* B) const;
         };
@@ -16,6 +16,9 @@ class PedidoArticulo {
         struct OrdenaPedidos {
             bool operator() (const Pedido* A, const Pedido* B) const;
         };
+
+        // En map, se puede añadir tercer y cuarto argumento
+        // Siendo el tercer argumento un comparador de ordenación, y el cuarto un asignador de memoria
 
         // asociacion directa 
         typedef std::map<Articulo*, LineaPedido, OrdenaArticulos> ItemsPedido;
@@ -26,12 +29,12 @@ class PedidoArticulo {
         typedef std::map<Articulo*, Pedidos, OrdenaArticulos> Articulo_Pedido; // asoc inversa
 
         // Creador de enlaces bidireccionales, indicando la cantidad por defecto si no se añade, + funcion sobrecargada invertida
-        void pedir(const Pedido& p, const Articulo& a, double pv, unsigned n = 1);
-        void pedir(const Articulo&, const Pedido&, double, unsigned n = 1); 
+        void pedir(const Pedido& p, const Articulo& a, double pv, unsigned int n = 1);
+        void pedir(const Articulo&, const Pedido&, double, unsigned int n = 1); 
         
         // Funciones consultoras miembras publicas
-        const ItemsPedido detalle(Pedido& P) const;
-        const Pedidos ventas(Articulo& A) const;
+        const ItemsPedido detalle(Pedido& P) const; // colección de articulos de un pedido, con su precio de venta y cantidad
+        const Pedidos ventas(Articulo& A) const; // colección de pedidos de un articulo, con su precio de venta y cantidad
 
         // Metodos que imprimen detalles de todos los pedidos y ventas, de los dos contenedores
         std::ostream& mostrarDetallesPedidos(std::ostream& os) const;

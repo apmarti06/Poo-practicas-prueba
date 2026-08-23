@@ -6,7 +6,7 @@ bool luhn(const Cadena& numero);
 
 //Modificamos nuestra implementacion del numero
 Numero::Numero(const Cadena& n) {
-    // hacemos uso de los algoritmos
+    // hacemos uso de los algoritmos, donde usando las clases de funcion, lo empleamos en los algoritmos stl
     Cadena aux(n);
 
     // Usamos primero, remove_if para quitar espacios
@@ -24,7 +24,7 @@ Numero::Numero(const Cadena& n) {
     if (it_num != aux.end()){
         throw Incorrecto(Razon::DIGITOS);
     }
-
+    // probamos la longitud del numero, que sea entre 13 y 19 inclusive
     if (aux.length() < 13 || aux.length() > 19){
         throw Incorrecto(Razon::LONGITUD);
     }

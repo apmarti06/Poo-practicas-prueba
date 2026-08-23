@@ -6,6 +6,8 @@
 // Definimos las constantes estáticas, SIEMPRE EN EL CPP o en un inline, si usamos polimorfismo
 const char* Clave::CORTA = "Contraseña demasiado corta.";
 const char* Clave::ERROR_CRYPT = "Error al cifrar la contraseña.";
+
+// Esta es privada, no se puede usar como miembro de clase
 const char Clave::caracteres_validos[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
 // Prototipo de la función
@@ -27,10 +29,11 @@ Clave::Clave(const char* cad) : passwd_cif{cad} { // la inicializamos en la list
     } 
     else {
         try {
-            // Preparamos con cifrado, para que nuestro crypt sea correcto
+            // Preparamos con cifrado, para que nuestro crypt sea correcto, donde usamos static para que la semilla no varíe
             static std::random_device random;
             static std::mt19937 gna{random()};
             static std::size_t n {sizeof(caracteres_validos) - 1}; // n = 64
+
             std::uniform_int_distribution<std::size_t> uniforme(0, n - 1);
             // Escogemos 2 aleatorios de caracteres validos y el terminador
             const char cifrado[3] = {caracteres_validos[uniforme(gna)], caracteres_validos[uniforme(gna)], '\0'}; 

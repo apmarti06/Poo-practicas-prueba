@@ -12,7 +12,7 @@ class Numero {
         // 3. Algoritmo de luhn ha producido un fallo
         typedef enum {LONGITUD, DIGITOS, NO_VALIDO} Razon;
 
-        // Operador de conversion para imprimir tarjeta, llamando de forma explicita al de Cadena
+        // Operador de conversion para imprimir tarjeta, llamando de forma implicita al de Cadena
         inline operator const char*() const {
             return num_t.operator const char *(); // es clase Cadena pues entonces tiene esta func()
         }

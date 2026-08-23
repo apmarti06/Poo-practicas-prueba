@@ -8,7 +8,7 @@ bool luhn(const Cadena& numero);
 // Primero al llamar a validar, eliminamos los espacios que tengamos
 // Despues validamos la longitud dentro de la lista inicializadora, tras terminar la llamada
 // Hacemos uso del constructor de copia para crear num_t, y por último verificamos que sea un número
-Numero::Numero(Cadena n) : num_t{validar_longitud(n)} {
+Numero::Numero(Cadena C) : num_t{validar_longitud(C)} {
     char caracteres[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
     // Comprobamos sus digitos y otros casos

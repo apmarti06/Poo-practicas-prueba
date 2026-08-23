@@ -8,7 +8,6 @@
 #include "fecha.hpp"
 
 //Metodos privados
-
 bool Fecha::descomponerFecha(const char* fechaFormateada, int &dia, int &mes , int &año) {
     bool correcto = std::sscanf(fechaFormateada, "%d/%d/%d", &dia, &mes, &año) == 3;
     if(correcto && año > 0) {
@@ -142,6 +141,7 @@ Fecha& Fecha::operator +=(int i)
     mes_ = fechaNormalizada.tm_mon + 1;
     año_ = fechaNormalizada.tm_year + 1900;
     actual = false;
+
     try {
         validarFecha();
     } catch (const Fecha::Invalida& e) {
@@ -168,7 +168,6 @@ Fecha Fecha::operator -(int i) const {
     copia += -i;
     return copia;
 }
-
 
 // Métodos que devolvemos objetos donde se alteran 
 Fecha& Fecha::operator-=(int i){ // 

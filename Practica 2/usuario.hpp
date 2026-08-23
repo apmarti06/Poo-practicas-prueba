@@ -1,3 +1,6 @@
+#ifndef USUARIO_HPP
+#define USUARIO_HPP
+
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -5,13 +8,10 @@
 
 #include "cadena.hpp" // importantisimo para usar funciones hash
 #include "clave.hpp"
-#include "tarjeta.hpp"
 #include "articulo.hpp"
 #include "numero.hpp"
 
-#ifndef USUARIO_HPP
-#define USUARIO_HPP
-
+class Tarjeta;
 class Usuario {
     public:
         // creamos los diccionarios a usar adelantando los nombres tarjetas_pago y articulos, asociacion clave-valor
@@ -33,8 +33,8 @@ class Usuario {
         inline Clave clave() const noexcept {return clave_; }
         
         // Consultoras especiales
-        inline Tarjetas tarjetas() {return tarjetas_; }
-        inline Articulos compra() {return articulos_; }
+        const Tarjetas& tarjetas() const {return tarjetas_; }
+        const Articulos& compra() const {return articulos_; }
 
         // Enlaces-Asociaciones de clases Tarjetas, añadir o eliminar tarjetas
         void es_titular_de(Tarjeta&);
@@ -45,7 +45,7 @@ class Usuario {
         
         // al ser un contenedor, hacemos uso de las operaciones size, max_size, swap, clear, push_back
         inline void vaciar_carro() noexcept {articulos_.clear(); } 
-        inline size_t n_articulos() noexcept const { return articulos_.size(); }
+        inline size_t n_articulos() const noexcept{ return articulos_.size(); }
 
         // Destructor
         ~Usuario();
